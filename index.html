@@ -26,8 +26,11 @@
         .card { background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 8px; }
         
         details.settings { background: #e0e0e0; padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 0.8rem; }
+        
+        /* ▼ 元の横並び（2列）に戻し、はみ出し防止の処理を追加しました ▼ */
         .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
-        .settings-grid input { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; box-sizing: border-box; }
+        .settings-grid > div { min-width: 0; } /* グリッドアイテムのはみ出しを防止 */
+        .settings-grid input { width: 100%; min-width: 0; padding: 6px 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; box-sizing: border-box; }
         
         /* バックアップボタン用 */
         .backup-row { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #bdbdbd; }
@@ -147,7 +150,6 @@
         targetDate: '' 
     };
 
-    // --- カンマ対応用の便利関数 ---
     function parseNumber(val) {
         if (!val && val !== 0 && val !== '0') return 0;
         const num = Number(String(val).replace(/,/g, ''));
@@ -164,9 +166,7 @@
             ele.value = formatNumber(ele.value);
         }
     }
-    // ----------------------------
 
-    // 過去のバージョン（残り日数）から目標日への自動移行処理
     if (config.days !== undefined && !config.targetDate) {
         let d = new Date();
         d.setDate(d.getDate() + config.days);
@@ -192,7 +192,6 @@
     }
 
     function init() {
-        // 初期表示で数値をカンマ付きにする
         document.getElementById('targetExp').value = formatNumber(config.target);
         document.getElementById('currentExp').value = formatNumber(config.current);
         document.getElementById('targetDateInput').value = config.targetDate;
@@ -216,7 +215,6 @@
     }
 
     function updateConfig() {
-        // カンマを取り除いて数値として保存
         config.target = parseNumber(document.getElementById('targetExp').value);
         config.current = parseNumber(document.getElementById('currentExp').value);
         config.targetDate = document.getElementById('targetDateInput').value;
@@ -387,7 +385,6 @@
                 config = data.config;
                 history = data.history;
 
-                // ▼ ここで古いデータの「残り日数」を「目標日」に変換
                 if (config.days !== undefined && !config.targetDate) {
                     let d = new Date();
                     d.setDate(d.getDate() + config.days);
