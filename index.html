@@ -27,12 +27,10 @@
         
         details.settings { background: #e0e0e0; padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 0.8rem; }
         
-        /* ▼ 元の横並び（2列）に戻し、はみ出し防止の処理を追加しました ▼ */
         .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
-        .settings-grid > div { min-width: 0; } /* グリッドアイテムのはみ出しを防止 */
+        .settings-grid > div { min-width: 0; }
         .settings-grid input { width: 100%; min-width: 0; padding: 6px 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; box-sizing: border-box; }
         
-        /* バックアップボタン用 */
         .backup-row { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #bdbdbd; }
         .backup-row button { flex: 1; padding: 8px; border: none; border-radius: 4px; font-weight: bold; color: white; cursor: pointer; font-size: 0.8rem;}
         .btn-export { background-color: #4caf50; }
@@ -58,11 +56,45 @@
         .day-num { font-size: 0.7rem; color: #95a5a6; }
         
         .day-cell.is-today { border: 2px solid var(--today-border) !important; background-color: #e3f2fd; }
-        .day-cell.is-today::after { content: "今日"; position: absolute; top: 0; right: 2px; font-size: 0.5rem; color: var(--today-border); font-weight: bold; }
+        .day-cell.is-today::after { content: "今日"; position: absolute; top: 0; right: 2px; font-size: 0.5rem; color: var(--today-border); font-weight: bold; z-index: 2; }
 
-        .status-reached { background-color: var(--success-bg); border-color: #a5d6a7; }
-        .status-missed { background-color: var(--error-bg); border-color: #ffcc80; }
+        /* status系 */
+        .day-cell.status-reached { background-color: var(--success-bg) !important; border-color: #a5d6a7 !important; }
+        .day-cell.status-missed { background-color: var(--error-bg) !important; border-color: #ffcc80 !important; }
         
+        /* ▼ ノマクエ2倍期間用のスタイル ▼ */
+        .bonus-period.day-cell { background-color: #fff9c4; border-color: #ffd54f; }
+        .day-cell.bonus-period.status-reached { background-color: #d1e7d2 !important; border-color: #c5e1c6 !important; }
+        .day-cell.bonus-period.status-missed { background-color: #fee9cc !important; border-color: #ffdcb0 !important; }
+
+        /* 帯デザイン */
+        .bonus-band {
+            background: linear-gradient(90deg, #ff416c, #ff4b2b);
+            color: #fff;
+            text-align: center;
+            font-size: 0.5rem;
+            font-weight: bold;
+            display: block;
+            width: calc(100% + 4px);
+            margin-left: -2px;
+            margin-top: -2px;
+            margin-bottom: 2px;
+            padding: 1px 0;
+            line-height: 1;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            letter-spacing: 0.5px;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+        /* ▼ 修正箇所：「2倍」と「今日」が重なるのを防ぐ ▼ */
+        .day-cell.bonus-period.is-today::after {
+            top: 11px; /* 「2倍」の赤い帯のすぐ下まで「今日」の文字をズラす */
+            background-color: rgba(255, 255, 255, 0.7); /* 背景と被っても見やすいように薄く白枠をつける */
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
         .day-info { font-size: 0.6rem; font-weight: bold; text-align: center; margin-top: auto; line-height: 1.1; width: 100%; }
         .emoji { font-size: 0.8rem; display: block; margin-bottom: 2px; }
         .text-reached { color: #2e7d32; }
@@ -300,8 +332,15 @@
             
             const cell = document.createElement('div');
             cell.className = 'day-cell' + (isToday ? ' is-today' : '');
-            
-            let content = `<div class="day-num">${d}</div>`;
+
+            // ▼ 5月(month=4)の15日〜21日なら2倍のスタイルを追加 ▼
+            const isBonus = (month === 4 && d >= 15 && d <= 21);
+            if (isBonus) cell.classList.add('bonus-period');
+
+            let content = `
+                ${isBonus ? '<div class="bonus-band">2倍</div>' : ''}
+                <div class="day-num">${d}</div>
+            `;
             
             if (data) {
                 monthlyGainTotal += data.gain;
