@@ -333,8 +333,8 @@
             const cell = document.createElement('div');
             cell.className = 'day-cell' + (isToday ? ' is-today' : '');
 
-            // ▼ 5月(month=4)の15日〜21日なら2倍のスタイルを追加 ▼
-            const isBonus = (month === 4 && d >= 15 && d <= 21);
+            // ▼ 5月(month=4)の15日〜21日、および6月(month=5)の6日〜12日なら2倍のスタイルを追加 ▼
+            const isBonus = (month === 4 && d >= 15 && d <= 21) || (month === 5 && d >= 6 && d <= 12);
             if (isBonus) cell.classList.add('bonus-period');
 
             let content = `
